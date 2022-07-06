@@ -1,0 +1,22 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/data.json {:mvn/version "2.3.1"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {org.clojure/test.check {:mvn/version "1.0.0"}}}
+  :runner
+  {:extra-deps {com.cognitect/test-runner
+                {:git/url "https://github.com/cognitect-labs/test-runner"
+                 :sha "b6b3193fcc42659d7e46ecd1884a228993441182"}}
+   :main-opts ["-m" "cognitect.test-runner"
+               "-d" "test"]}
+  :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "2.0.165"}}
+            :ns-default   hf.depstar
+            :exec-fn      uberjar
+            :exec-args    {:jar        brainfuck-interpreter.jar
+                           :compile-ns [brainfuck-interpreter.main]
+                           :aliases    [:native]}
+            :main-opts ["-m" "hf.depstar.uberjar" "brainfuck-interpreter.jar"
+                        "-C" "-m" "exfn.brainfuck-interpreter"]}
+  :native  {:jvm-opts   ["-Dclojure.compiler.direct-linking=true"]
+            :extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}}}}}
