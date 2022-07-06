@@ -60,7 +60,6 @@
       (inc ip)
       (inc (jmp-table ip)))))
 
-;; missing - need to set memory if its not already set.
 (defn brain-fuck [code input]
   (let [code (seq code)
         jmp-table (build-jmp-table code)
