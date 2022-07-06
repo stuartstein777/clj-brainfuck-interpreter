@@ -1,6 +1,4 @@
-(ns exfn.brainfuck-interpreter
-  (:require [clojure.set :as set]
-            [clojure.string :as str]))
+(ns exfn.brainfuck-interpreter)
 
 ;; > : increment data pointer.
 ;; < : decrement data pointer
@@ -50,13 +48,13 @@
 ;; }
 
 (defn get-fwd-jump-target [{:keys [dp memory ip jmp-table]}]
-  (let [byte-at-dp (memory dp)]
+  (let [byte-at-dp (memory dp 0)]
     (if (zero? byte-at-dp)
       (inc (jmp-table ip))
       (inc ip))))
 
 (defn get-bkwd-jump-target [{:keys [dp memory ip jmp-table]}]
-  (let [byte-at-dp (memory dp)]
+  (let [byte-at-dp (memory dp 0)]
     (if (zero? byte-at-dp)
       (inc ip)
       (inc (jmp-table ip)))))
@@ -71,18 +69,18 @@
                :jmp-table jmp-table
                :output    []
                :dp        0
-               :memory    (zipmap (range 3000) (repeat 0))}]
+               :memory    {}}]
       (if (= (:ip vm) code-len)
         (apply str (vm :output))
         (let [cur (nth code (:ip vm))]
           (condp = cur
             \+ (recur (-> vm
                           (update :ip inc)
-                          (update-in [:memory (vm :dp)] increment)))
+                          (update-in [:memory (vm :dp)] (fnil increment 0))))
 
             \- (recur (-> vm
                           (update :ip inc)
-                          (update-in [:memory (vm :dp)] decrement)))
+                          (update-in [:memory (vm :dp)] (fnil decrement 0))))
 
             \> (recur (-> vm
                           (update :ip inc)
@@ -94,7 +92,7 @@
 
             \. (recur (-> vm
                           (update :ip inc)
-                          (update :output conj (char (get-in vm [:memory (vm :dp)])))))
+                          (update :output conj (char (get-in vm [:memory (vm :dp)] 0)))))
 
             \, (recur (-> vm
                           (update :ip inc)
@@ -109,20 +107,24 @@
 
             (recur (-> vm (update :ip inc)))))))))
 
+
 (brain-fuck
  "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
- "")
+ ""
+ )
 
 (brain-fuck
  "++++++++[>+++++++++++>+++++++++>++++<<<-]
   >-.>.-------.<---.>>.<<.>+++++++.---.>
   .<---.<--.>-.++++++++.<----.>---.<
   +++++++.>---.++++++++.--.+++++.-------.>.<-.<.>---.++++++++."
- "")
+ ""
+ )
 
 (brain-fuck
  ",[.,]"
- "ABC")
+ "ABC"
+ )
 
 (brain-fuck "+++++++++++
 >+>>>>++++++++++++++++++++++++++++++++++++++++++++
@@ -135,3 +137,4 @@
 ++++++++++++++++++++++++++++++++++++++++++++.[-]<<
 <<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<
 [-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]" "")
+
