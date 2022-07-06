@@ -36,7 +36,8 @@
        (reduce reducer {:instr 0 :open [] :res {}})
        :res))
 
-(build-jmp-table (map identity "+[--[+[-+-[++]]]]"))
+(comment
+  (build-jmp-table (seq "+[--[+[-+-[++]]]]")))
 
 ;; representation of the vm
 ;; {:ip      0        the instruction pointer, current instruction we point to.
@@ -61,11 +62,11 @@
 
 ;; missing - need to set memory if its not already set.
 (defn brain-fuck [code input]
-  (let [code (map identity code)
+  (let [code (seq code)
         jmp-table (build-jmp-table code)
         code-len (count code)]
     (loop [vm {:ip        0
-               :input     (map identity input)
+               :input     (seq input)
                :jmp-table jmp-table
                :output    []
                :dp        0
@@ -123,8 +124,7 @@
 
 (brain-fuck
  ",[.,]"
- "ABC"
- )
+ "ABC")
 
 (brain-fuck "+++++++++++
 >+>>>>++++++++++++++++++++++++++++++++++++++++++++
